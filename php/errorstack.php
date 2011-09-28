@@ -22,64 +22,78 @@
  * For examples on how to use the ErrorStack class see example.php
  */
 class ErrorStack {
-	
-	/**
-	 * Your errorstack key goes here.
-	 * Example: public static $key = "c162a320c89b7c7165oe7u8i9cf878";
-	 */
-	public static $key = [your errorstack key goes here];
-	
-	/**
-	 * Reports errors to errorstack
-	 *
-	 * @param $error	exception object thrown by error or caught by catch block
-	 */
-	function report($error) {
-		$params = array(
-			"_s" => ErrorStack::$key,
-			"_r" => "json",
-			"Msg" => $error->getMessage(),
-			"File" => $error->getFile(),
-			"Line" => $error->getLine()
-			
-		);
-		ErrorStack::send($params);
-	}
-	
-	/**
-	 * Logs message or object to errorstack's rotating log for debugging
-	 *
-	 * @param $input	string or object that can be json encoded for rotating log
-	 */
-	function log($input) {
-		$type = "text";
-		if (!is_string($input)) {
-			$input = json_encode($input);
-			$type = "json";
-		}
-		$params = array(
-			"_s" => ErrorStack::$key,
-			"_r" => "json",
-			"_t" => $type,
-			"_msg" => $input
-			
-		);
-		ErrorStack::send($params, "http://www.errorstack.com/log");
-	}
-	
-	/**
-	 * Sends error report or log request to errorstack using curl and 
-	 * throws away response
-	 */
-	function send($params, $url="http://www.errorstack.com/submit") {
-		$ch = curl_init();
-		curl_setopt($ch,CURLOPT_URL,$url);
-		curl_setopt($ch,CURLOPT_POST,true);
-		curl_setopt($ch,CURLOPT_POSTFIELDS,$params);
-		curl_setopt($ch	, CURLOPT_RETURNTRANSFER, 1);
-		$result = curl_exec($ch);
-		curl_close($ch);
-	}
+    
+    /**
+     * Your errorstack key goes here.
+     * Example: public static $key = "c162a320c89b7c7165oe7u8i9cf878";
+     */
+    public static $key = "8ffb98f99f487cd53b8f63af27680989";
+    
+    /**
+     * Reports errors to errorstack
+     *
+     * @param $error    exception object thrown by error or caught by catch block
+     */
+    function report($error) {
+        $params = array(
+            "_s" => ErrorStack::$key,
+            "_r" => "json",
+            "Msg" => $error->getMessage(),
+            "File" => $error->getFile(),
+            "Line" => $error->getLine()
+            
+        );
+        ErrorStack::send($params);
+    }
+    
+    /**
+    * Reports error using custom object instead of native PHP error object
+    * @param $params associative array containing info to report. Should map
+    * to params sent by report function
+    */
+    function custom($params) {
+        $default = array(
+            "_s" => ErrorStack::$key,
+            "_r" => "json"
+        );
+        $params = array_merge($default, $params);
+        ErrorStack::send($params);
+    }
+    
+    /**
+     * Logs message or object to errorstack's rotating log for debugging
+     *
+     * @param $input    string or object that can be json encoded for rotating log
+     */
+    function log($input) {
+        $type = "text";
+        if (!is_string($input)) {
+            $input = json_encode($input);
+            $type = "json";
+        }
+        $params = array(
+            "_s" => ErrorStack::$key,
+            "_r" => "json",
+            "_t" => $type,
+            "_msg" => $input
+            
+        );
+        ErrorStack::send($params, "http://www.errorstack.com/log");
+    }
+    
+    /**
+     * Sends error report or log request to errorstack using curl and 
+     * throws away response
+     */
+    function send($params, $url="http://www.errorstack.com/submit") {
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_URL,$url);
+        curl_setopt($ch,CURLOPT_POST,true);
+        curl_setopt($ch,CURLOPT_POSTFIELDS,$params);
+        curl_setopt($ch , CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+    }
 }
 
 /**
